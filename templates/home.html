@@ -1,0 +1,72 @@
+<html>
+
+    <head>
+
+        <title>WebSocket Chat</title>
+
+        <script language="Javascript" src="/static/jquery-1.3.2.min.js"></script>
+        <script language="Javascript" src="/static/t.js"></script>
+
+        <script type='text/javascript'>
+          if (!window.WebSocket)
+            alert("WebSocket not supported by this browser");
+    
+            function getKeyCode(ev) {
+                if (window.event) return window.event.keyCode;
+                return ev.keyCode;
+            } 
+
+            $(document).ready(
+                function(){
+                    canvas = $('#tetris')[0]
+                    shape = new Shape();
+                    tetrisBoard.setup( canvas );
+                    tetrisBoard.draw();
+                    tick = function(){
+                        shape.y += 1
+                        tetrisBoard.draw()
+                    }
+                    //setInterval( tick, 1000 )
+                    $(document).keydown(
+                        function(e){
+                            redraw = false;
+                            if (window.event) keycode = window.event.keyCode;
+                            else if (e) keycode = e.which;
+                            console.debug(keycode)
+                            if( keycode == 38 ){
+                                shape.rotate();
+                                redraw = true;
+                            }else if( keycode == 37 ){ //left
+                                if(shape.x > 0 || (shape.x + shape.sideroom(false)>0)){
+                                    shape.x -= 1;
+                                    redraw = true;
+                                }
+                            }else if( keycode == 39 ){ // right
+                                if( shape.x + shape.matsize < numCols ||
+                                    ( shape.x + shape.matsize - shape.sideroom(true) <numCols ) ){
+                                    shape.x += 1;
+                                    redraw = true;
+                                }
+                            }
+                            else if( keycode == 13 ){
+                                shape.y = shape.drop( tetrisBoard.board );
+                                tetrisBoard.draw(true)
+                                shape = new Shape()
+                                tetrisBoard.draw(false)
+                                return false
+                            }
+                            if( redraw ) tetrisBoard.draw()
+
+                        }
+                    )  
+                } 
+            );
+        </script>
+    </head>
+    <body>
+		<div id="main">
+            <canvas id="tetris" width="300" height="602"></canvas>
+        </div>
+    </body>
+</html>
+        

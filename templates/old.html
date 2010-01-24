@@ -1,0 +1,73 @@
+<html>
+    <head>
+        <title>WebSocket Chat</title>
+
+        <script language="Javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js"></script>
+
+        <script type='text/javascript'>
+          if (!window.WebSocket)
+            alert("WebSocket not supported by this browser");
+    
+            function getKeyCode(ev) {
+                if (window.event) return window.event.keyCode;
+                return ev.keyCode;
+            } 
+
+            var stuff = {
+                start: function(){
+                    this._ws=new WebSocket("ws://localhost:8080/ws/");
+                    this._ws.onopen=this._onopen;
+                    this._ws.onmessage=this._onmessage;
+                    this._ws.onclose=this._onclose;
+                },
+
+                _onopen: function(){
+                    console.debug("opened.");
+                },
+
+                _onclose: function(){
+                    console.debug("closed.");
+                },
+
+                _onmessage: function(message){
+					$('#karla').html( message.data );
+                    console.debug("got:" + message.data);
+                },
+                 
+                _send: function(message){
+                    if (this._ws) this._ws.send(message);
+                },
+                                                                        
+            };
+        </script>
+    </head>
+    <body>
+
+        <script type='text/javascript'>
+        //$('username').setAttribute('autocomplete','OFF');
+        //$('username').onkeyup = function(ev) { var keyc=getKeyCode(ev); if (keyc==13 || keyc==10) { room.join($F('username')); return false; } return true; } ;        
+        //$('joinB').onclick = function(event) { room.join($F('username')); return false; };
+        //$('phrase').setAttribute('autocomplete','OFF');
+        //$('sendB').onclick = function(event) { room.chat($F('phrase')); $('phrase').value=''; return false; };
+        $(document).ready( function(){
+                                console.debug("hey");
+                                stuff.start();
+                                $('#typebox').keyup( 
+                                    function(ev) {
+                                        stuff._send( $('#typebox').val() );
+                                    });
+                        });
+        </script>
+
+        <p>
+        This is a demonstration of the Jetty websocket server. yeah
+        <input type="text" id="typebox"/>
+        </p>
+		<div id="karla">
+		</div>
+		<div id="karla">
+		</div>
+
+    </body>
+</html>
+        
