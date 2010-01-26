@@ -2,100 +2,24 @@ var numRows = 20;
 var numCols = 10;
 var cellSize = 20;
 
-var pieces = 
-    [<!--{{{-->
-                [
-                    [[0,0,0],
-                     [0,1,0],
-                     [1,1,1]],
-
-                    [[1,0,0],
-                     [1,1,0],
-                     [1,0,0]],
-
-                    [[1,1,1],
-                     [0,1,0],
-                     [0,0,0]],
-
-                    [[0,0,1],
-                     [0,1,1],
-                     [0,0,1]],
-                ],
-
-                [ 
-                  [[1,1],
-                  [1,1]],
-                ],
-
-                [
-                    [[0,1,0],
-                     [0,1,0],
-                     [1,1,0]],
-
-                    [[1,0,0],
-                     [1,1,1],
-                     [0,0,0]],
-
-                    [[0,1,1],
-                     [0,1,0],
-                     [0,1,0]],
-
-                    [[0,0,0],
-                     [1,1,1],
-                     [0,0,1]],
-                ],
-
-                [
-                    [[0,0,0,0],
-                     [1,1,1,1],
-                     [0,0,0,0],
-                     [0,0,0,0]],
-
-                    [[0,1,0,0],
-                     [0,1,0,0],
-                     [0,1,0,0],
-                     [0,1,0,0]],
-                ],
-
-                [
-                    [[0,0,0],
-                     [1,1,1],
-                     [1,0,0]],
-
-                    [[1,1,0],
-                     [0,1,0],
-                     [0,1,0]],
-
-                    [[0,0,1],
-                     [1,1,1],
-                     [0,0,0]],
-
-                    [[0,1,0],
-                     [0,1,0],
-                     [0,1,1]],
-                ],
-
-                [
-                    [[0,0,1],
-                     [0,1,1],
-                     [0,1,0]],
-
-                    [[1,1,0],
-                     [0,1,1],
-                     [0,0,0]],
-                ],
-
-                [
-                    [[0,1,1],
-                     [1,1,0],
-                     [0,0,0]],
-
-                    [[0,1,0],
-                     [0,1,1],
-                     [0,0,1]],
-                ]
-                 
-         ];<!--}}}-->
+pieces = []
+var pieces_desc = [[3,'000010111100110100111010000001011001'],[2,'1111'],[3,'010010110100111000011010010000111001'],[4,'00001111000000000100010001000100'],[3,'000111100110010010001111000010010011'],[3,'001011010110011000'],[3,'011110000010011001']]
+for( p in pieces_desc){
+    var size = pieces_desc[p][0]
+    var str = pieces_desc[p][1]
+    var pieceset = []
+    for(i=0,pieceSlice=str.slice(0,size*size);i<str.length;i+=size*size,pieceSlice=str.slice(i,i+size*size)){
+        var piece = [];
+        for(j=0;j<pieceSlice.length;j+=size){
+            rowSlice = pieceSlice.slice(j, j+size);
+            var row = []
+            for( c in rowSlice ){ row.push( parseInt(rowSlice[c] ) ) }
+            piece.push( row )
+        }
+        pieceset.push( piece )
+    } 
+    pieces.push(pieceset)
+}
 
         var shape = null;
         var tetrisBoard = {
@@ -284,8 +208,6 @@ var pieces =
                 if(maxheight==null) maxheight=numRows-this.matsize+this.roombottom()
                 return maxheight
             }
-
-
         }<!--}}}-->
 
         function randompiece(){ return pieces[Math.floor(Math.random()*7)][0] }
