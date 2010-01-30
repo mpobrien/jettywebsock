@@ -1,14 +1,11 @@
 <html>
     <head>
-        <title>WebSocket Chat</title>
+        <title>tetris</title>
 
         <script language="Javascript" src="/static/jquery-1.3.2.min.js"></script>
         <script language="Javascript" src="/static/t.js"></script>
 
         <script type='text/javascript'>
-          if (!window.WebSocket)
-            alert("WebSocket not supported by this browser");
-    
             function getKeyCode(ev) {
                 if (window.event) return window.event.keyCode;
                 return ev.keyCode;
@@ -81,9 +78,14 @@
         </script>
     </head>
     <body>
-		<div id="main">
-            <canvas id="tetris" width="300" height="600"></canvas>
+        <div style="width:100%">
+            <div id="main" style="width:100%; margin-left:auto; margin-right: auto">
+                <canvas id="tetris" width="300" height="600"></canvas>
+            </div>
         </div>
+        &rarr; &darr; and &larr; to move<br/>
+        &uarr; to rotate<br/>
+        <b>enter</b> to drop
     </body>
 </html>
         
