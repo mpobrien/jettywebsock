@@ -1,7 +1,5 @@
 <html>
-
     <head>
-
         <title>WebSocket Chat</title>
 
         <script language="Javascript" src="/static/jquery-1.3.2.min.js"></script>
@@ -23,10 +21,16 @@
                     tetrisBoard.setup( canvas );
                     tetrisBoard.draw();
                     tick = function(){
-                        shape.y += 1
+                        if( addmatrixIsLegal( tetrisBoard.board, shape.matrix, shape.x, shape.y+1 ) ){
+                            shape.y += 1
+                        }else{
+                            shape.y = shape.drop( tetrisBoard.board );
+                            tetrisBoard.draw(true, true)
+                            shape = new Shape()
+                        }
                         tetrisBoard.draw()
                     }
-                    //setInterval( tick, 1000 )
+                    setInterval( tick, 1000 )
                     $(document).keydown(
                         function(e){
                             redraw = false;
@@ -78,7 +82,7 @@
     </head>
     <body>
 		<div id="main">
-            <canvas id="tetris" width="300" height="602"></canvas>
+            <canvas id="tetris" width="300" height="600"></canvas>
         </div>
     </body>
 </html>
