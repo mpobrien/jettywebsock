@@ -32,28 +32,41 @@
                             redraw = false;
                             if (window.event) keycode = window.event.keyCode;
                             else if (e) keycode = e.which;
-                            console.debug(keycode)
+                            //console.debug( keycode )
                             if( keycode == 38 ){
-                                shape.rotate();
+                                shape.rotate( tetrisBoard.board );
                                 redraw = true;
+                                e.preventDefault();
                             }else if( keycode == 37 ){ //left
                                 if(shape.x > 0 || (shape.x + shape.sideroom(false)>0)){
-                                    shape.x -= 1;
-                                    redraw = true;
+                                    if( shape.canMove( tetrisBoard.board, -1, 0 ) ){
+                                        shape.x -= 1;
+                                        redraw = true;
+                                    }
                                 }
+                                e.preventDefault();
                             }else if( keycode == 39 ){ // right
                                 if( shape.x + shape.matsize < numCols ||
                                     ( shape.x + shape.matsize - shape.sideroom(true) <numCols ) ){
-                                    shape.x += 1;
-                                    redraw = true;
+                                    if( shape.canMove( tetrisBoard.board, 1, 0 ) ){
+                                        shape.x += 1;
+                                        redraw = true;
+                                    }
                                 }
+                                e.preventDefault();
                             }
                             else if( keycode == 13 ){
                                 shape.y = shape.drop( tetrisBoard.board );
-                                tetrisBoard.draw(true)
+                                tetrisBoard.draw(true, true)
                                 shape = new Shape()
                                 tetrisBoard.draw(false)
-                                return false
+                                e.preventDefault();
+                            }else if( keycode == 40 ){
+                                if( shape.canMove( tetrisBoard.board, 0, 1 ) ){
+                                    shape.y += 1;
+                                    redraw = true;
+                                }
+                                e.preventDefault();
                             }
                             if( redraw ) tetrisBoard.draw()
 

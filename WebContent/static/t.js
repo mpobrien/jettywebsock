@@ -61,11 +61,14 @@ for( p in pieces_desc){
                     ctx.stroke()
                 }
             },<!--}}}-->
-            draw: function(permanent){<!--{{{-->
+            draw: function(permanent, doClear){<!--{{{-->
 			    ctx = this.canvElm.getContext("2d");
                 ctx.clearRect( 0, 0, cellSize*numCols, cellSize*numRows );
                 this.grid()
-                newboard = addmatrix( this.board, shape.matrix, shape.x, shape.y )
+                var newboard = addmatrix( this.board, shape.matrix, shape.x, shape.y )
+                if( doClear ){
+                    newboard = this.clearlines(newboard);
+                }
                 for( row=0; row<numRows; row++ ){
                     for( col = 0; col < numCols; col++ ){
                         if( newboard[row][col] > 0 ){
@@ -78,6 +81,32 @@ for( p in pieces_desc){
                     this.board = newboard
                 }
             },<!--}}}-->
+
+            clearlines: function(newboard){
+                rowloop: 
+                for( row=numRows-1; row>=0; row-- ){
+                    var isClear = true;
+                    for( col = 0; col < numCols; col++ ){
+                        if( newboard[row][col] == 0 ){
+                            isClear = false;
+                            break;
+                        }
+                    }
+                    if( isClear ){
+                        console.debug( "before",newboard.length );
+                        newboard.splice(row, 1);
+                        console.debug( "after", newboard.length );
+                        newboard.unshift([0,0,0,0,0,0,0,0,0,0])
+                        console.debug( "afterafter", newboard.length );
+                        row++
+                    }
+                }
+                console.debug( newboard.length, numRows )
+                //while( newboard.length < numRows ){
+                    //newboard.shift([0,0,0,0,0,0,0,0,0,0])
+                //}
+                return newboard;
+            }
         }
 
         function addmatrix(m1, m2, x, y){<!--{{{-->
@@ -91,6 +120,23 @@ for( p in pieces_desc){
             }
             return m3
         }<!--}}}-->
+
+        function addmatrixIsLegal(m1, m2, x, y){
+            for( i=0; i<m2.length; i++ ){
+                for( j=0; j<m2[i].length; j++){
+                    if( x + j < 0 || x + j >= numCols ){
+                        if( m2[i][j] > 0 ) return false
+                        else continue
+                    }
+                    if( y+i < 0 || y + i >= numRows ){
+                        if( m2[i][j] > 0 ) return false
+                        else continue
+                    }
+                    if( ( m1[y+i][x+j] + m2[i][j] ) > 1 ) return false
+                }
+            }
+            return true
+        }
 
         function Shape(){<!--{{{-->
             piecenum = Math.floor(Math.random()*7);
@@ -112,14 +158,20 @@ for( p in pieces_desc){
             }<!--}}}-->
 
             this.x = Math.floor( (numCols - matsize)/2 )
-            //this.y = ( 0 - this.roomtop())
-            this.y = 0;
+            this.y = ( 0 - this.roomtop())
+            //this.y = 0;
 
-            this.rotate = function(){
-                //var newpieceindex = (this.pieceset_index + 1) % (this.numrots) 
-                //var newmatrix = this.pieceset[newpieceindex]//init_matrix;  
-                this.pieceset_index = (this.pieceset_index + 1) % (this.numrots)
-                this.matrix = this.pieceset[ this.pieceset_index ]//init_matrix;
+            this.rotate = function( grid ){
+                var newpieceindex = (this.pieceset_index + 1) % (this.numrots) 
+                var newmatrix = this.pieceset[newpieceindex]//init_matrix;  
+                if( addmatrixIsLegal( grid, newmatrix, this.x, this.y ) ){
+                    this.pieceset_index = newpieceindex
+                    this.matrix = newmatrix
+                }
+            }
+
+            this.canMove = function( grid, dx, dy ){
+                return addmatrixIsLegal( grid, this.matrix, this.x + dx, this.y + dy );
             }
 
             this.roomleft = function(){
