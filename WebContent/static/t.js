@@ -93,15 +93,15 @@ for( p in pieces_desc){
                         }
                     }
                     if( isClear ){
-                        console.debug( "before",newboard.length );
+                        //console.debug( "before",newboard.length );
                         newboard.splice(row, 1);
-                        console.debug( "after", newboard.length );
+                        //console.debug( "after", newboard.length );
                         newboard.unshift([0,0,0,0,0,0,0,0,0,0])
-                        console.debug( "afterafter", newboard.length );
+                        //console.debug( "afterafter", newboard.length );
                         row++
                     }
                 }
-                console.debug( newboard.length, numRows )
+                //console.debug( newboard.length, numRows )
                 //while( newboard.length < numRows ){
                     //newboard.shift([0,0,0,0,0,0,0,0,0,0])
                 //}
@@ -132,7 +132,7 @@ for( p in pieces_desc){
                         if( m2[i][j] > 0 ) return false
                         else continue
                     }
-                    console.debug(y, x, i, j, y + i, x + j)
+                    //console.debug(y, x, i, j, y + i, x + j)
                     if( ( m1[y+i][x+j] + m2[i][j] ) > 1 ) return false
                 }
             }
