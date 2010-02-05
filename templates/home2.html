@@ -6,30 +6,36 @@
         <script language="Javascript" src="/static/t.js"></script>
 
         <script type='text/javascript'>
-            function getKeyCode(ev) {
+            function getKeyCode(ev) {<!--{{{-->
                 if (window.event) return window.event.keyCode;
                 return ev.keyCode;
-            } 
+            } <!--}}}-->
 
+		$(document).ready(
+			//function(){
+				//ws = new WebSocket("ws://localhost:8080/ws/");
+				//ws.onopen = function(){ alert("opened") };
+				//ws.onclose = function(){ alert("closed") };
+				//ws.onmessage = function(d){ alert(d.data) };
+			//}
+		);
+
+/*
             $(document).ready(
                 function(){
-                    var canvas = $('#tetris')[0]
+                    canvas = $('#tetris')[0]
                     shape = new Shape();
                     tetrisBoard.setup( canvas );
-                    tetrisBoard.draw( canvas );
-					shape.draw( canvas );
+                    tetrisBoard.draw();
                     tick = function(){
                         if( addmatrixIsLegal( tetrisBoard.board, shape.matrix, shape.x, shape.y+1 ) ){
                             shape.y += 1
                         }else{
-                            shape.y = shape.drop( tetrisBoard );
-							tetrisBoard.putshape( shape );
-							tetrisBoard.clearlines( );
-                            tetrisBoard.draw( canvas )
+                            shape.y = shape.drop( tetrisBoard.board );
+                            tetrisBoard.draw(true, true)
                             shape = new Shape()
                         }
-                        tetrisBoard.draw( canvas )
-						shape.draw( canvas );
+                        tetrisBoard.draw()
                     }
                     setInterval( tick, 1000 )
                     $(document).keydown(
@@ -37,12 +43,13 @@
                             redraw = false;
                             if (window.event) keycode = window.event.keyCode;
                             else if (e) keycode = e.which;
+                            //console.debug( keycode )
                             if( keycode == 38 ){
                                 shape.rotate( tetrisBoard.board );
                                 redraw = true;
                                 e.preventDefault();
                             }else if( keycode == 37 ){ //left
-                                if(shape.x > 0 || (shape.x + shape.spaceCount('l')>0)){
+                                if(shape.x > 0 || (shape.x + shape.sideroom(false)>0)){
                                     if( shape.canMove( tetrisBoard.board, -1, 0 ) ){
                                         shape.x -= 1;
                                         redraw = true;
@@ -51,7 +58,7 @@
                                 e.preventDefault();
                             }else if( keycode == 39 ){ // right
                                 if( shape.x + shape.matsize < numCols ||
-                                    ( shape.x + shape.matsize - shape.spaceCount('r') < numCols ) ){
+                                    ( shape.x + shape.matsize - shape.sideroom(true) <numCols ) ){
                                     if( shape.canMove( tetrisBoard.board, 1, 0 ) ){
                                         shape.x += 1;
                                         redraw = true;
@@ -60,12 +67,10 @@
                                 e.preventDefault();
                             }
                             else if( keycode == 13 ){
-                                shape.y = shape.drop( tetrisBoard );
-								tetrisBoard.putshape( shape );
-								tetrisBoard.clearlines( );
-								tetrisBoard.draw( canvas )
+                                shape.y = shape.drop( tetrisBoard.board );
+                                tetrisBoard.draw(true, true)
                                 shape = new Shape()
-								shape.draw( canvas );
+                                tetrisBoard.draw(false)
                                 e.preventDefault();
                             }else if( keycode == 40 ){
                                 if( shape.canMove( tetrisBoard.board, 0, 1 ) ){
@@ -74,15 +79,13 @@
                                 }
                                 e.preventDefault();
                             }
-                            if( redraw ){ 
-								tetrisBoard.draw( canvas )
-								shape.draw( canvas )
-							}
+                            if( redraw ) tetrisBoard.draw()
 
                         }
                     )  
                 } 
             );
+			*/
         </script>
     </head>
     <body>

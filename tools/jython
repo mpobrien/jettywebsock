@@ -1,8 +1,7 @@
 #!/bin/bash
 
 
-export CLASSPATH=./lib/freemarker.jar:./lib/gdata-base-1.0.jar:./lib/google-collect-1.0-rc1.jar:./lib/guice-1.0.jar:./lib/jetty-6.1.3.jar:./lib/jetty-util-6.1.3.jar:./lib/servlet-api-2.5.jar:/usr/share/java/jython-2.5.1.jar:./WebContent/WEB-INF/classes:./lib/freemarker.jar:./lib/gdata-base-1.0.jar:./lib/orm.jar:./lib/jdbc-redis.jar:./lib/forms.jar
-
+export CLASSPATH=./lib/*:./WebContent/WEB-INF/classes:/usr/share/java/jython-2.5.1.jar
 echo $CLASSPATH
 
 

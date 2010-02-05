@@ -1,0 +1,68 @@
+client sends name -------------------> Server creates new game
+                                       Server sets name for player 1 of new game
+                                       Server generates unique URL for new game.
+                 <-------------------- Server sends redirect to client of newly created game
+client loads page
+of new game
+.
+.
+. (page load)
+.
+.
+page body finishes load.
+Client opens WebSocket   -----------------> Server activates game into WAITING state.
+to server.                                  Server sends "waiting for other player" signal to client.
+
+
+
+.
+.
+.
+.
+
+Client 2 requests page -------------------> Server checks that game is in WAITING state - ok - sends back sign-in page
+                                                 (otherwise, redirect to home page.)
+
+Client 2 enters name.------------------------> Server sets name and sends to client 1. Server sends "ready?" signal to client 1 and 2
+
+
+
+
+                                      
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

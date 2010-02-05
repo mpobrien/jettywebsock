@@ -5,6 +5,7 @@ import com.google.common.base.*;
 
 public class Piece{
 
+	//static data//{{{
     public static final int[] PIECE_SIZES = {3, 2, 3, 4, 3, 3, 3};
     public static final String[] PIECE_DATA = { "111010000001011001000010111100110100",
                                                 "1111",
@@ -13,10 +14,10 @@ public class Piece{
                                                 "000111100110010010001111000010010011",
                                                 "001011010110011000",
                                                 "011110000010011001" };
-    public static final List<Piece> PIECES;
-    private static Random randGen = new Random( System.currentTimeMillis() );
-
-    static{//{{{
+    public static final List<Piece> PIECES;//}}}
+    
+	// Setup piece data.   {{{ 
+    static{
 		ImmutableList.Builder<Piece> piecesList = new ImmutableList.Builder<Piece>();
 		for( int i = 0; i< PIECE_SIZES.length; i++){
 			int size = PIECE_SIZES[i];
@@ -38,6 +39,7 @@ public class Piece{
     }//}}}
 
 	private Grid[] grids;
+    private static Random randGen = new Random( System.currentTimeMillis() );
 
     public Piece( Grid[] grids ){//{{{
 		this.grids = grids;
@@ -59,8 +61,8 @@ public class Piece{
 		}
 	}//}}}
 
-	public Piece randomPiece(){
-		return PIECES.get( randGen.nextInt( PIECES.size() ) );
-	}
+	public static int randomPieceNum(){//{{{
+		return randGen.nextInt( PIECES.size() );
+	}//}}}
 
 }
