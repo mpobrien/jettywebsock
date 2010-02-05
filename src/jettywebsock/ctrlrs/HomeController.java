@@ -10,10 +10,7 @@ public class HomeController extends Controller{
 
     @Override
     public WebResponse get(HttpServletRequest req, HttpServletResponse res){
-		return responses.render("home.html");
-
-        //return new StringWebResponse("Hello World!");
-
+		return responses.render("index.html");
     }
 
 }

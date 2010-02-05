@@ -1,5 +1,7 @@
 package jettywebsock.tetris;
 import java.util.*;
+import com.google.common.collect.*;
+import com.google.common.base.*;
 
 public class Piece{
 
@@ -11,18 +13,17 @@ public class Piece{
                                                 "000111100110010010001111000010010011",
                                                 "001011010110011000",
                                                 "011110000010011001" };
-    public static final List<Piece> PIECES = new ArrayList();
-    static{
+    public static final List<Piece> PIECES;
+    private static Random randGen = new Random( System.currentTimeMillis() );
+
+    static{//{{{
+		ImmutableList.Builder<Piece> piecesList = new ImmutableList.Builder<Piece>();
 		for( int i = 0; i< PIECE_SIZES.length; i++){
 			int size = PIECE_SIZES[i];
 			String pieceStr = PIECE_DATA[i];
 			int numGrids =  pieceStr.length() / (size * size);
 			int gridPartSize = size*size;
 			Grid[] gridSet = new Grid[numGrids];
-// 			for( int j=0, int r=0, String pieceSlice = pieceStr.substring(0,gridPartSize); j<pieceStr.length(); j+=gridPartSize, r++, pieceSlice=pieceStr.substring(j,j+gridPartSize)){
-// 				gridSet[ r ] = new Grid( size, pieceSlice );
-// 			} 
-
 			int j=0, r=0;
 			String pieceSlice;
 			while( j < pieceStr.length() ){
@@ -31,32 +32,35 @@ public class Piece{
 				j += gridPartSize;
 				r++;
 			}
-			PIECES.add( new Piece( gridSet ) );
+			piecesList.add( new Piece( gridSet ) );
 		}
-
-    }
-
+		PIECES = piecesList.build();
+    }//}}}
 
 	private Grid[] grids;
 
-    public Piece( Grid[] grids ){
+    public Piece( Grid[] grids ){//{{{
 		this.grids = grids;
-	}
+	}//}}}
 
-	public String toString(){
+	public String toString(){//{{{
 		StringBuilder output = new StringBuilder("");
 		for( Grid grid : this.grids ){
 			output.append( grid.toString() + "\n" );
 		}
 		return output.toString();
-	}
+	}//}}}
 
-	public static void main(String args[]){
+	public static void main(String args[]){//{{{
 		System.out.println( PIECES.size() );
 		for( Piece p : PIECES ){
 			System.out.println( p );
 			System.out.println( "------------------" );
 		}
+	}//}}}
+
+	public Piece randomPiece(){
+		return PIECES.get( randGen.nextInt( PIECES.size() ) );
 	}
 
 }
