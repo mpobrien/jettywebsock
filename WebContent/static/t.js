@@ -110,7 +110,11 @@ for( p in pieces_desc){//{{{
             m3 = []
             for(row=0;row<m1.length;row++){ m3[row] = m1[row] }
             for( i=0; i < m2.length; i++ ){
-				m3[y+i] |= (m2[i] << x)
+                if( x >= 0 ){
+				    m3[y+i] |= (m2[i] << x)
+                }else{
+				    m3[y+i] |= (m2[i] >> (-1*x))
+                }
 			}
             return m3
         }<!--}}}-->
@@ -121,7 +125,6 @@ for( p in pieces_desc){//{{{
 				if( y+i < 0 || y+i >= numRows ){
 					if( m2[i] > 0 ) return false
 				}
-				if( x
                 for( j=0; j<m2[i].length; j++){
                     if( x + j < 0 || x + j >= numCols ){
                         if( (m2[i] & (1 << j) > 0 ) ) return false
