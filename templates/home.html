@@ -6,83 +6,139 @@
         <script language="Javascript" src="/static/t.js"></script>
 
         <script type='text/javascript'>
-            function getKeyCode(ev) {
-                if (window.event) return window.event.keyCode;
-                return ev.keyCode;
-            } 
+var started = false;
+var canvas;
+x = 0;
+function getKeyCode(ev) {
+	if (window.event) return window.event.keyCode;
+	return ev.keyCode;
+} 
 
-            $(document).ready(
-                function(){
-                    var canvas = $('#tetris')[0]
-                    shape = new Shape();
-                    tetrisBoard.setup( canvas );
-                    tetrisBoard.draw( canvas );
-					shape.draw( canvas );
-                    tick = function(){
-                        if( addmatrixIsLegal( tetrisBoard.board, shape.matrix, shape.x, shape.y+1 ) ){
-                            shape.y += 1
-                        }else{
-                            shape.y = shape.drop( tetrisBoard );
-							tetrisBoard.putshape( shape );
-							tetrisBoard.clearlines( );
-                            tetrisBoard.draw( canvas )
-                            shape = new Shape()
-                        }
-                        tetrisBoard.draw( canvas )
-						shape.draw( canvas );
-                    }
-                    setInterval( tick, 1000 )
-                    $(document).keydown(
-                        function(e){
-                            redraw = false;
-                            if (window.event) keycode = window.event.keyCode;
-                            else if (e) keycode = e.which;
-                            if( keycode == 38 ){
-                                shape.rotate( tetrisBoard.board );
-                                redraw = true;
-                                e.preventDefault();
-                            }else if( keycode == 37 ){ //left
-                                if(shape.x > 0 || (shape.x + shape.spaceCount('l')>0)){
-                                    if( shape.canMove( tetrisBoard.board, -1, 0 ) ){
-                                        shape.x -= 1;
-                                        redraw = true;
-                                    }
-                                }
-                                e.preventDefault();
-                            }else if( keycode == 39 ){ // right
-                                if( shape.x + shape.matsize < numCols ||
-                                    ( shape.x + shape.matsize - shape.spaceCount('r') < numCols ) ){
-                                    if( shape.canMove( tetrisBoard.board, 1, 0 ) ){
-                                        shape.x += 1;
-                                        redraw = true;
-                                    }
-                                }
-                                e.preventDefault();
-                            }
-                            else if( keycode == 13 ){
-                                shape.y = shape.drop( tetrisBoard );
-								tetrisBoard.putshape( shape );
-								tetrisBoard.clearlines( );
-								tetrisBoard.draw( canvas )
-                                shape = new Shape()
-								shape.draw( canvas );
-                                e.preventDefault();
-                            }else if( keycode == 40 ){
-                                if( shape.canMove( tetrisBoard.board, 0, 1 ) ){
-                                    shape.y += 1;
-                                    redraw = true;
-                                }
-                                e.preventDefault();
-                            }
-                            if( redraw ){ 
-								tetrisBoard.draw( canvas )
-								shape.draw( canvas )
-							}
+function setupGame(){
+	tetrisBoard.setup( canvas );
+	tetrisBoard.draw( canvas );
+}
+function runGame(){
+	started = true;
+	setupKeys()
+	shape.draw( canvas );
+	dropTimer = setInterval( tick, 1000 )
+}
 
-                        }
-                    )  
-                } 
-            );
+function sendShape(x,y,i){
+	ws.send("x" + x + "y" + y + "i" + i );
+}
+
+function tick(i){
+	if( shape ){
+		if( addmatrixIsLegal( tetrisBoard.board, shape.matrix, shape.x, shape.y+1 ) ){
+			shape.y += 1
+		}else{
+			shape.y = shape.drop( tetrisBoard );
+			sendShape(shape.x, shape.y, shape.pieceset_index);
+			tetrisBoard.putshape( shape );
+			tetrisBoard.clearlines( );
+			tetrisBoard.draw( canvas )
+			shape = null;
+			//shape = new Shape() //todo wait for shape from server.
+		}
+		tetrisBoard.draw( canvas )
+		shape.draw( canvas );
+	}
+	if( i ){
+		dropTimer = setInterval( tick, 1000 );
+	}
+}
+
+function setupKeys(){
+	$(document).keydown(
+		function(e){
+			redraw = false;
+			if (window.event) keycode = window.event.keyCode;
+			else if (e) keycode = e.which;
+			if( keycode == 38 && shape ){
+				shape.rotate( tetrisBoard.board );
+				redraw = true;
+				e.preventDefault();
+			}else if( keycode == 37 && shape ){ //left
+				if(shape.x > 0 || (shape.x + shape.spaceCount('l')>0)){
+					if( shape.canMove( tetrisBoard.board, -1, 0 ) ){
+						shape.x -= 1;
+						redraw = true;
+					}
+				}
+				e.preventDefault();
+			}else if( keycode == 39 && shape){ // right
+				if( shape.x + shape.matsize < numCols ||
+					( shape.x + shape.matsize - shape.spaceCount('r') < numCols ) ){
+					if( shape.canMove( tetrisBoard.board, 1, 0 ) ){
+						shape.x += 1;
+						redraw = true;
+					}
+				}
+				e.preventDefault();
+			}else if( keycode == 13 && shape ){
+				shape.y = shape.drop( tetrisBoard );
+				sendShape(shape.x, shape.y, shape.pieceset_index);
+				tetrisBoard.putshape( shape );
+				tetrisBoard.clearlines( );
+				tetrisBoard.draw( canvas )
+				shape = null;
+				//shape = new Shape()
+				//shape.draw( canvas );
+				e.preventDefault();
+			}else if( keycode == 40 && shape ){
+				if( shape.canMove( tetrisBoard.board, 0, 1 ) ){
+					shape.y += 1;
+					redraw = true;
+				}
+				e.preventDefault();
+			}
+			if( redraw ){ 
+				tetrisBoard.draw( canvas )
+				shape.draw( canvas )
+			}
+		})  
+}
+
+
+$(document).ready(
+	function(){
+		canvas = $('#tetris')[0]
+		setupGame()
+		ws = new WebSocket("ws://localhost:8080/ws/");
+		  ws.onopen = function() {
+			console.debug("opened");
+		  };
+		  ws.onmessage = function(e) {
+			  if(e.data[0]=='p'){
+				  newpiecenum = parseInt(e.data[1])
+				  console.debug("just got shape: " + newpiecenum) 
+				  shape = new Shape(newpiecenum)
+				  if( !started ){
+					  runGame();
+				  }
+				  clearInterval(dropTimer)
+				  tick( true );
+				  //dropTimer = setInterval( tick, 1000 )
+			  }
+			// e.data contains received string.
+		  };
+		  ws.onclose = function() {
+
+			output("onclose");
+		  };
+	}
+/*
+	function(){
+		var canvas = $('#tetris')[0]
+		//shape = new Shape();
+		tetrisBoard.setup( canvas );
+		tetrisBoard.draw( canvas );
+		shape.draw( canvas );
+	} 
+	*/
+);
         </script>
     </head>
     <body>
@@ -99,14 +155,18 @@
             </div>
         </div>
 	<script type="text/javascript">
+	/*
 	var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
 	document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+	*/
 	</script>
 	<script type="text/javascript">
+	/*
 	try {
 	var pageTracker = _gat._getTracker("UA-12798677-1");
 	pageTracker._trackPageview();
-	} catch(err) {}</script>
+	} catch(err) {}*/</script>
+	
     </body>
 </html>
         

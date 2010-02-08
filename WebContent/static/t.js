@@ -119,29 +119,41 @@ for( p in pieces_desc){//{{{
             return m3
         }<!--}}}-->
 
-        function addmatrixIsLegal(m1, m2, x, y){
+        function showbinary(x, w){
+            result = ''
+            for(i=0;i<w;i++){
+                result += ( x & (1<<i)) > 0 ? '1' : '0'
+            }
+            return result
+        }
+
+
+        function addmatrixIsLegal(m1, m2, x, y, w){
             for( i=0; i<m2.length; i++ ){
-				if( m1[y+i] && m2[i] > 0 ) return false;
+                if( ( m1[y+i] & (m2[i] << x )) > 0 ){
+                    return false;
+                }
 				if( y+i < 0 || y+i >= numRows ){
-					if( m2[i] > 0 ) return false
+					if( m2[i] > 0 ){
+                        return false
+                    }
 				}
-                for( j=0; j<m2[i].length; j++){
-                    if( x + j < 0 || x + j >= numCols ){
-                        if( (m2[i] & (1 << j) > 0 ) ) return false
-                        else continue
+                mask =  (1 << (-x)) - 1;
+                if( x < 0 ){
+                    if( m2[i] & mask > 0 ){
+                        return false;
                     }
-                    if( y+i < 0 || y + i >= numRows ){
-						if( (m2[i] & (1 << j ) > 0 ) ) return false;
-                        else continue
-                    }
-					if( ( m1[y+i] & m2[i] & (1 << j )) > 1 ) return false
+                }
+                if( x + w >= numCols ){
+                    if(  (( mask << (numCols - w) ) & m2[i] ) > 0 ) return false
                 }
             }
             return true
         }
 
-        function Shape(){
-            piecenum = Math.floor(Math.random()*7);
+        function Shape(x){
+			var piecenum;
+			piecenum = x;
             this.pieceset = pieces[piecenum]
             this.pieceset_index = 0;
             this.numrots = this.pieceset.length;
@@ -191,14 +203,14 @@ for( p in pieces_desc){//{{{
             this.rotate = function( grid ){
                 var newpieceindex = (this.pieceset_index + 1) % (this.numrots) 
                 var newmatrix = this.pieceset[newpieceindex]//init_matrix;  
-                if( addmatrixIsLegal( grid, newmatrix, this.x, this.y ) ){
+                if( addmatrixIsLegal( grid, newmatrix, this.x, this.y, this.matsize ) ){
                     this.pieceset_index = newpieceindex
                     this.matrix = newmatrix
                 }
             }
 
             this.canMove = function( grid, dx, dy ){
-                return addmatrixIsLegal( grid, this.matrix, this.x + dx, this.y + dy );
+                return addmatrixIsLegal( grid, this.matrix, this.x + dx, this.y + dy, this.matsize );
             }
 
             this.bottoms = function(){

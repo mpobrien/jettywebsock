@@ -47,8 +47,11 @@ public class Piece{
 
 	public String toString(){//{{{
 		StringBuilder output = new StringBuilder("");
-		for( Grid grid : this.grids ){
-			output.append( grid.toString() + "\n" );
+		for( int i=0; i < this.grids[0].getNumRows(); i++ ){
+			for( Grid grid : this.grids ){
+				output.append( grid.getRowAsString(i) + "   " );
+			}
+			output.append("\n");
 		}
 		return output.toString();
 	}//}}}
@@ -64,5 +67,26 @@ public class Piece{
 	public static int randomPieceNum(){//{{{
 		return randGen.nextInt( PIECES.size() );
 	}//}}}
+
+	public Grid getGrid(int gridNum){
+		if( gridNum < 0 || gridNum > this.grids.length - 1) throw new IllegalArgumentException("invalid gridNum.");
+		return this.grids[gridNum];
+	}
+
+	public String describe(){
+		String res = "";
+		for( Grid g : this.grids ){
+			res += "[";
+			for( int r = 0; r < g.getNumRows(); r++ ){
+				int b = 0;
+				for( int c = g.getRowAt(r).nextSetBit(0); c>=0; c=g.getRowAt(r).nextSetBit(c+1) ){
+					b |= (1 << c);
+				}
+				res += Integer.toString( b );
+			}
+			res += "],";
+		}
+		return res;
+	}
 
 }

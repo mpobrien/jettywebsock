@@ -9,10 +9,12 @@ import com.google.inject.*;
 import com.google.inject.servlet.*;
 import jettywebsock.tetris.*;
 import org.apache.log4j.*;
+import java.util.regex.*;
 
 @Singleton
 public class WebSocketTesting extends WebSocketServlet {
 	Logger log = Logger.getLogger( WebSocketTesting.class );
+	public static final Pattern updatePattern = Pattern.compile("x(\\-?\\d{1,2})y(\\-?\\d{1,2})i(\\d)");
 
 	private final Set<PlayerConnection> players = Collections.synchronizedSet( new HashSet<PlayerConnection>() );
 
@@ -34,6 +36,7 @@ public class WebSocketTesting extends WebSocketServlet {
 		public void onConnect(Outbound outbound) {//{{{
 			this.outbound = outbound;
 			int nextPieceIndex = Piece.randomPieceNum();
+			log.error( "next piece index: " + nextPieceIndex );
 			nextPiece = Piece.PIECES.get( nextPieceIndex );
 			try{
 				this.outbound.sendMessage( (byte)0, "p" + Integer.toString(nextPieceIndex) );
@@ -46,13 +49,32 @@ public class WebSocketTesting extends WebSocketServlet {
 		public void onMessage(byte frame, byte[] data, int offset, int length) {}
 
 		public void onMessage(byte frame, String data) {
-// 			for (PlayerConnection member : members) {
-// 				try {
-// 					member.outbound.sendMessage(frame,data);
-// 				} catch(IOException e) {
-// 					e.printStackTrace();
-// 				}
-// 			}
+			Matcher m = updatePattern.matcher(data);
+			log.error("data: " +data);
+			if( m.matches() ){
+				Integer x = Integer.parseInt( m.group(1) );
+				Integer y = Integer.parseInt( m.group(2) );
+				Integer i = Integer.parseInt( m.group(3) );
+				try{
+					log.error("adding at x:" + x + ", y:" + y + " \n" + nextPiece.getGrid(i));
+					this.playerGrid.addGrid( nextPiece.getGrid(i), x, y);
+					this.playerGrid.clearLines();
+					log.error( this.playerGrid );
+					int nextPieceIndex = Piece.randomPieceNum();
+					nextPiece = Piece.PIECES.get( nextPieceIndex );
+					log.error("next piece is " + nextPieceIndex  + " \n" + nextPiece);
+					try{
+						this.outbound.sendMessage( (byte)0, "p" + Integer.toString(nextPieceIndex) );
+					}catch(Exception e){
+						log.error("problem: ", e);
+					}
+				}catch(Exception e){
+					log.error("CHEATER", e);
+					log.error(" nextPiece: \n" + nextPiece );
+				}
+			}else{
+				log.error("nope.");
+			}
 		}
 
 		public void onDisconnect() {
