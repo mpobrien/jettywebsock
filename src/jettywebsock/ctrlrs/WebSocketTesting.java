@@ -24,6 +24,7 @@ public class WebSocketTesting extends WebSocketServlet {
 	}
 
 	protected WebSocket doWebSocketConnect(HttpServletRequest request, String protocol){
+		System.out.println("web socket connect.");
 		return new PlayerConnection();
 	}
 
