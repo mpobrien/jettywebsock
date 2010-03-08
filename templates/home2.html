@@ -22,10 +22,15 @@ var gameId = '${gameId}';
 var started = false;
 var ws;
 var canvas;
+var tetrisBoard = new TetrisBoard();
+var opponentBoard = new TetrisBoard();
+
 
 function setupGame(){
 	tetrisBoard.setup( canvas );
+    opponentBoard.setup(canvas, 250)
 	tetrisBoard.draw( canvas );
+    opponentBoard.draw( canvas );
 }
 
 function runGame(){
@@ -49,8 +54,10 @@ function connectToGame(gameId){
 			}
 			clearInterval(dropTimer)
 			tick( true );
-		}else{
-			console.debug("opponent has", e.data)
+		}else if(e.data[0]=='o'){
+			console.debug("opponent has", e.data.slice(1,e.data.length))
+            opponentBoard.reset( decode(e.data.slice(1,e.data.length)) )
+            opponentBoard.draw(canvas)
 		}
 	};
 }

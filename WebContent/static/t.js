@@ -45,47 +45,47 @@ function prettyShow(mat){
 }
 
         var shape = null;
-        var tetrisBoard = {
-            setup: function(canvElm, offset){
+        function TetrisBoard() {
+            this.setup = function(canvElm, offset){
 				if( !offset ) this.offset = 0;
 				else this.offset = offset;
                 this.canvElm = canvElm;
 				this.board = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
-            },
+            }
 
-			reset: function(board){
+			this.reset = function(board){
 				this.board = board
-			},
+			}
 
-			get: function(row, col){
+			this.get = function(row, col){
 				return this.board[row] & (1 << col);
-			},
+			}
 
-			set: function(row, col){
+			this.set = function(row, col){
 				this.board[row] |= (1 << col);
 			},
 
-            grid: function(canvElm){<!--{{{-->
+            this.grid = function(canvElm){
                 ctx = canvElm.getContext("2d");
                 ctx.lineWidth = 1
                 ctx.beginPath()
                 for( row=0; row<=numRows; row++ ){
-                    ctx.moveTo(0, row*cellSize);
-                    ctx.lineTo(numCols* cellSize, row*cellSize);
+                    ctx.moveTo(0 + this.offset, row*cellSize);
+                    ctx.lineTo(numCols*cellSize + this.offset, row*cellSize);
                     ctx.stroke()
                 }
                 for( col=0; col<=numCols; col++ ){
-                    ctx.moveTo(col*cellSize, 0);
-                    ctx.lineTo(col*cellSize, numRows*cellSize);
+                    ctx.moveTo(col*cellSize + this.offset, 0);
+                    ctx.lineTo(col*cellSize + this.offset, numRows*cellSize);
                     ctx.stroke()
                 }
-            },<!--}}}-->
+            }
 
-			putshape: function(theShape){
+			this.putshape = function(theShape){
 				this.board = addmatrix( this.board, theShape.matrix, theShape.x, theShape.y );
-			},
+			}
 
-            draw: function( canvElm ){<!--{{{-->
+            this.draw = function( canvElm ){
 			    ctx = canvElm.getContext("2d");
                 ctx.clearRect( 0 + this.offset, 0, cellSize*numCols, cellSize*numRows );
                 this.grid(canvElm)
@@ -97,9 +97,9 @@ function prettyShow(mat){
                         }
                     }
                 }
-            },<!--}}}-->
+            }
 
-            clearlines: function(){
+            this.clearlines = function(){
 				var numlines = 0;
                 rowloop: 
 				for( row = 0; row< numRows; row++){
