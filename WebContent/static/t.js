@@ -21,12 +21,41 @@ for( p in pieces_desc){//{{{
     pieces.push(pieceset)
 }//}}}
 
+function decode(x){
+	var matrix = []
+	var rowstrs = x.split(",")
+	var i;
+	for(i in rowstrs){
+		matrix.unshift(parseInt(rowstrs[i]))
+	}
+	return matrix
+}
+
+function prettyShow(mat){
+	var i, j;
+	var result = "";
+	for(i=0;i<mat.length;i++){
+		console.debug(mat[i])
+		for(j=0;j<10;j++){
+			result += (mat[i] & (1<<j)) > 0 ? "1" : "0";
+		}
+		result += "\n";
+	}
+	return result;
+}
+
         var shape = null;
         var tetrisBoard = {
-            setup: function(canvElm){
+            setup: function(canvElm, offset){
+				if( !offset ) this.offset = 0;
+				else this.offset = offset;
                 this.canvElm = canvElm;
 				this.board = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
             },
+
+			reset: function(board){
+				this.board = board
+			},
 
 			get: function(row, col){
 				return this.board[row] & (1 << col);
@@ -58,13 +87,13 @@ for( p in pieces_desc){//{{{
 
             draw: function( canvElm ){<!--{{{-->
 			    ctx = canvElm.getContext("2d");
-                ctx.clearRect( 0, 0, cellSize*numCols, cellSize*numRows );
+                ctx.clearRect( 0 + this.offset, 0, cellSize*numCols, cellSize*numRows );
                 this.grid(canvElm)
                 for( row=0; row<numRows; row++ ){
                     for( col = 0; col < numCols; col++ ){
 						if( this.get(row, col ) ){
                             ctx.beginPath();
-					        ctx.fillRect( col * cellSize, row * cellSize, cellSize, cellSize)
+					        ctx.fillRect( col * cellSize + this.offset, row * cellSize, cellSize, cellSize)
                         }
                     }
                 }
@@ -84,25 +113,6 @@ for( p in pieces_desc){//{{{
 				for(i=0;i<numlines;i++){
 					this.board.unshift(0)
 				}
-
-				/*
-                for( row=numRows-1; row>=0; row-- ){
-					if( this.board[row] && ( 1023 ) == 1023 ){
-						isClear = true;
-					}
-                    /*var isClear = true;
-                    for( col = 0; col < numCols; col++ ){
-                        if( this.get(row, col) == 0 ){
-                            isClear = false;
-                            break;
-                        }
-                    }
-                    if( isClear ){
-                        this.board.splice(row, 1);
-                        this.board.unshift(0)
-						row++;
-                    }
-                }*/
             }
         }
 

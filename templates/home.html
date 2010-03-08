@@ -1,14 +1,24 @@
 <html>
     <head>
         <title>tetris</title>
+		<h3>${gameId}</h3>
 
+        <!--{{{ Javscript Includes -->
         <script language="Javascript" src="/static/jquery-1.3.2.min.js"></script>
         <script language="Javascript" src="/static/t.js"></script>
+        <script type="text/javascript" src="/static/swfobject.js"></script>
+        <script type="text/javascript" src="/static/FABridge.js"></script>
+        <script type="text/javascript" src="/static/web_socket.js"></script> <!--}}}-->
 
         <script type='text/javascript'>
+
+WebSocket.__swfLocation = "/static/WebSocketMain.swf";
+var gameId = "${gameId}"
 var started = false;
+var o
 var canvas;
 x = 0;
+
 function getKeyCode(ev) {
 	if (window.event) return window.event.keyCode;
 	return ev.keyCode;
@@ -18,6 +28,7 @@ function setupGame(){
 	tetrisBoard.setup( canvas );
 	tetrisBoard.draw( canvas );
 }
+
 function runGame(){
 	started = true;
 	setupKeys()
@@ -108,6 +119,9 @@ $(document).ready(
 		setupGame()
 		ws = new WebSocket("ws://localhost:8080/ws/");
 		  ws.onopen = function() {
+			  if( gameId != '' ){
+				  ws.send("g" + gameId );
+			  }
 			console.debug("opened");
 		  };
 		  ws.onmessage = function(e) {
@@ -125,7 +139,7 @@ $(document).ready(
 			// e.data contains received string.
 		  };
 		  ws.onclose = function() {
-			console.debug("onclose");
+			console.debug("closed.");
 		  };
 	}
 /*
@@ -141,6 +155,7 @@ $(document).ready(
         </script>
     </head>
     <body>
+		<div<a href="/twoplayer/${gameId}">yeah</a></div>
         <div style="width:100%">
             <div id="main" style="width:100%; margin-left:auto; margin-right: auto; text-align:center">
                 <canvas id="tetris" width="200" height="400"></canvas>

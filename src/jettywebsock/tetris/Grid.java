@@ -1,6 +1,7 @@
 package jettywebsock.tetris;
 import java.util.*;
 import org.apache.log4j.*;
+import com.google.common.base.Joiner;
 
 
 public class Grid{
@@ -9,6 +10,7 @@ public class Grid{
     public static final int NUMROWS = 20;
     public static final int NUMCOLS = 10;
 	public enum Direction{ TOP, BOTTOM, LEFT, RIGHT; }
+	public static final Joiner csv = Joiner.on(",");
 
     private BitSet[] board;
 
@@ -219,7 +221,7 @@ public class Grid{
 		}*/
 	}//}}}
 
-	public void clearLines(){
+	public void clearLines(){//{{{
 		int numRowsEmpty = board.length - 1;
 		BitSet[] newBoard = new BitSet[board.length];
 		for( int i = board.length - 1; i >= 0; i-- ){
@@ -231,6 +233,12 @@ public class Grid{
 			newBoard[ numRowsEmpty-- ] = new BitSet();
 		}
 		this.board = newBoard;
+	}//}}}
+
+	public String stringEncoded(){
+		StringBuilder result = new StringBuilder("");
+		List<Integer> encodedInts = this.encodeFull();
+		return csv.join(encodedInts);
 	}
 
 }
